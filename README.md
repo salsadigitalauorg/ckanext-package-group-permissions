@@ -15,7 +15,7 @@ Our solution ended up being a little simpler for our requirements:
 
 ### Override CKAN `member_create` function
 
-The overridden function is largely based on the core CKAN `member_create` function, with an additional check to see if the user is an admin or editor of the organisation that owns the dataset.
+The overridden function is largely based on the [core CKAN `member_create` function](https://github.com/ckan/ckan/blob/2.8/ckan/logic/auth/create.py#L229), with an additional check to see if the user is an admin or editor of the organisation that owns the dataset.
 
 ### Template overrides
 
