@@ -23,12 +23,12 @@ This solution also requires some CKAN templates to be overridden:
 
 `templates/package/group_list.html`
 
-Overridden to display ALL groups to the user IF the user has `package_update` permission for the dataset.
+Overridden to display **all** groups to the user **if** the user has `package_update` permission for the dataset.
 
 If the user does not have `package_update` permission - it falls back to the CKAN default of displaying only the groups that user is assigned to.
 
 `templates/group/snippets/group_item.html`
 
-Overridden to display the delete button on a group assigned to the dataset if the user has `member_delete` permission for the group.
+Overridden to display the **delete** button on a group assigned to the dataset if the user has `member_delete` permission for the group.
 
 This also supports the default CKAN behaviour to display the delete button on any groups that user is assigned to.
