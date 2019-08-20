@@ -32,3 +32,20 @@ If the user does not have `package_update` permission - it falls back to the CKA
 Overridden to display the **delete** button on a group assigned to the dataset if the user has `member_delete` permission for the group.
 
 This also supports the default CKAN behaviour to display the delete button on any groups that user is assigned to.
+
+## Installation
+
+1. Clone this repository into your CKAN extensions directory, e.g. `/usr/lib/ckan/default/src`
+1. Activate your virtualenv and run the `setup.py`, e.g.
+
+        . /usr/lib/ckan/default/bin/activate
+
+        cd ckanext-package-group-permissions
+
+        python setup.py develop
+
+1. Add `package_group_permissions` to `ckan.plugins` in your CKAN `.ini` file, e.g.
+
+        ckan.plugins = ... package_group_permissions
+
+1. Restart Apache/Nginx/UWSGI
