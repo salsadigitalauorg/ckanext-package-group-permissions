@@ -1,79 +1,34 @@
 # ckanext-package-group-permissions
-A CKAN extension for allowing dataset organisation admins and editors to add a dataset to any group.
+A CKAN extension to allow any user with admin or editor role in an organisation to assign datasets in their organisation to any group in CKAN.
 
-## Local environment setup
-- Make sure that you have latest versions of all required software installed:
-  - [Docker](https://www.docker.com/)
-  - [Pygmy](https://pygmy.readthedocs.io/)
-  - [Ahoy](https://github.com/ahoy-cli/ahoy)
-- Make sure that all local web development services are shut down (Apache/Nginx, Mysql, MAMP etc).
-- Checkout project repository (in one of the [supported Docker directories](https://docs.docker.com/docker-for-mac/osxfs/#access-control)).  
-- `pygmy up`
-- `ahoy build`
+## Our use case
 
-Use `admin`/`password` to login to CKAN.
+We wanted the ability for any user with admin or editor role in an organisation to be able to assign datasets in their organisation to any group in CKAN.
 
-## Available `ahoy` commands
-Run each command as `ahoy <command>`.
-  ```  
-   build        Build or rebuild project.
-   clean        Remove containers and all build files.
-   cli          Start a shell inside CLI container or run a command.
-   doctor       Find problems with current project setup.
-   down         Stop Docker containers and remove container, images, volumes and networks.
-   flush-redis  Flush Redis cache.
-   info         Print information about this project.
-   install-site Install a site.
-   lint         Lint code.
-   logs         Show Docker logs.
-   pull         Pull latest docker images.
-   reset        Reset environment: remove containers, all build, manually created and Drupal-Dev files.
-   restart      Restart all stopped and running Docker containers.
-   start        Start existing Docker containers.
-   stop         Stop running Docker containers.
-   test-bdd     Run BDD tests.
-   test-unit    Run unit tests.
-   up           Build and start Docker containers.
-  ```
+Previously, this was handled manually, i.e. each admin/editor user was assigned as an admin of each group in CKAN by adding them via the API. This process was very time consuming as the number of admins/editors and groups increased.
 
-## Coding standards
-Python code linting uses [flake8](https://github.com/PyCQA/flake8) with configuration captured in `.flake8` file.   
+We tried implementing the suggestions outlined in this Stack Overflow question: https://stackoverflow.com/questions/37279610/ckan-package-group-permissions - however we were unable to get it working as desired.
 
-Set `ALLOW_LINT_FAIL=1` in `.env` to allow lint failures.
+## Our solution
 
-## Nose tests
-`ahoy test-unit`
+Our solution ended up being a little simpler for our requirements:
 
-Set `ALLOW_UNIT_FAIL=1` in `.env` to allow unit test failures.
+### Override CKAN `member_create` function
 
-## Behavioral tests
-`ahoy test-bdd`
+The overridden function is largely based on the core CKAN `member_create` function, with an additional check to see if the user is an admin or editor of the organisation that owns the dataset.
 
-Set `ALLOW_BDD_FAIL=1` in `.env` to allow BDD test failures.
+### Template overrides
 
-### How it works
-We are using [Behave](https://github.com/behave/behave) BDD _framework_ with additional _step definitions_ provided by [Behaving](https://github.com/ggozad/behaving) library.
+This solution also requires some CKAN templates to be overridden:
 
-Custom steps described in `test/features/steps/steps.py`.
+`templates/package/group_list.html`
 
-Test scenarios located in `test/features/*.feature` files.
+Overridden to display ALL groups to the user IF the user has `package_update` permission for the dataset.
 
-Test environment configuration is located in `test/features/environment.py` and is setup to connect to a remote Chrome
-instance running in a separate Docker container. 
+If the user does not have `package_update` permission - it falls back to the CKAN default of displaying only the groups that user is assigned to.
 
-During the test, Behaving passes connection information to [Splinter](https://github.com/cobrateam/splinter) which
-instantiates WebDriver object and establishes connection with Chrome instance. All further communications with Chrome 
-are handled through this driver, but in a developer-friendly way.
+`templates/group/snippets/group_item.html`
 
-For a list of supported step-definitions, see https://github.com/ggozad/behaving#behavingweb-supported-matcherssteps.
+Overridden to display the delete button on a group assigned to the dataset if the user has `member_delete` permission for the group.
 
-## Automated builds (Continuous Integration)
-In software engineering, continuous integration (CI) is the practice of merging all developer working copies to a shared mainline several times a day. 
-Before feature changes can be merged into a shared mainline, a complete build must run and pass all tests on CI server.
-
-This project uses [Circle CI](https://circleci.com/) as a CI server: it imports production backups into fully built codebase and runs code linting and tests. When tests pass, a deployment process is triggered for nominated branches (usually, `master` and `develop`).
-
-Add `[skip ci]` to the commit subject to skip CI build. Useful for documentation changes.
-
-### SSH
-Circle CI supports shell access to the build for 120 minutes after the build is finished when the build is started with SSH support. Use "Rerun job with SSH" button in Circle CI UI to start build with SSH support.
+This also supports the default CKAN behaviour to display the delete button on any groups that user is assigned to.
