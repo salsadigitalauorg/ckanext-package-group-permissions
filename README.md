@@ -1,7 +1,11 @@
 # ckanext-package-group-permissions
 A CKAN extension to allow any user with admin or editor role in an organisation to assign datasets in their organisation to any group in CKAN.
 
-Tested with CKAN 2.8.3
+## Compatibility
+
+This extension has been tested with CKAN v2.8.3.
+
+While not tested with v2.7.0+ - the required permission was changed from 'update' to 'manage_group' in v2.7.0, so this **should** work in v2.7.0+.
 
 ## Our use case
 
