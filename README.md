@@ -3,7 +3,7 @@ A CKAN extension to allow any user with admin or editor role in an organisation 
 
 ## Compatibility
 
-This extension has been tested with CKAN v2.8.3.
+This extension has been tested with CKAN v2.8.3 & v2.9.2.
 
 While not tested with v2.7.0+ - the required permission was changed from 'update' to 'manage_group' in v2.7.0, so this **should** work in v2.7.0+.
 

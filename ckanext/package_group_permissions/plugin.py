@@ -1,10 +1,11 @@
-from ckan.common import _, c
-
 import ckan.authz as authz
 import ckan.logic.auth as logic_auth
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
-import helpers
+from ckanext.package_group_permissions import helpers
+
+_ = toolkit._
+g = toolkit.g
 
 
 class PackageGroupPermissionsPlugin(plugins.SingletonPlugin):
@@ -26,7 +27,8 @@ class PackageGroupPermissionsPlugin(plugins.SingletonPlugin):
         }
         return auth_functions
 
-    def member_create(self, context, data_dict):
+    @toolkit.chained_auth_function
+    def member_create(self, next_auth, context, data_dict):
         """
         This code is largely borrowed from /src/ckan/ckan/logic/auth/create.py
         With a modification to allow users to add datasets to any group
@@ -34,30 +36,13 @@ class PackageGroupPermissionsPlugin(plugins.SingletonPlugin):
         :param data_dict:
         :return:
         """
-        group = logic_auth.get_group_object(context, data_dict)
-        user = context['user']
-
-        # User must be able to update the group to add a member to it
-        permission = 'update'
-        # However if the user is member of group then they can add/remove datasets
-        if not group.is_organization and data_dict.get('object_type') == 'package':
-            permission = 'manage_group'
-
-        if c.controller in ['package', 'dataset'] and c.action in ['groups']:
+        authorized = False
+        if g.controller in ['package', 'dataset'] and g.action in ['groups']:
             authorized = helpers.user_has_admin_access(include_editor_access=True)
-            # Fallback to the default CKAN behaviour
-            if not authorized:
-                authorized = authz.has_user_permission_for_group_or_org(group.id,
-                                                                        user,
-                                                                        permission)
-        else:
-            authorized = authz.has_user_permission_for_group_or_org(group.id,
-                                                                    user,
-                                                                    permission)
+
         if not authorized:
-            return {'success': False,
-                    'msg': _('User %s not authorized to edit group %s') %
-                           (str(user), group.id)}
+            # Fallback to the default CKAN behaviour
+            return next_auth(context, data_dict)
         else:
             return {'success': True}
 

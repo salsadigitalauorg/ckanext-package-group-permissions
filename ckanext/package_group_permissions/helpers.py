@@ -1,5 +1,3 @@
-from ckan.common import c
-
 import ckan.plugins.toolkit as toolkit
 
 
@@ -8,12 +6,12 @@ def is_user_sysadmin(user=None):
     :rtype: boolean
     """
     if user is None:
-        user = toolkit.c.userobj
+        user = toolkit.g.userobj
     return user is not None and user.sysadmin
 
 
 def user_has_admin_access(include_editor_access=False):
-    user = toolkit.c.userobj
+    user = toolkit.g.userobj
     # If user is "None" - they are not logged in.
     if user is None:
         return False
@@ -31,7 +29,7 @@ def get_all_groups():
     groups = toolkit.get_action('group_list')(
         data_dict={'include_dataset_count': False, 'all_fields': True})
     pkg_group_ids = set(group['id'] for group
-                        in c.pkg_dict.get('groups', []))
+                        in toolkit.g.pkg_dict.get('groups', []))
     return [[group['id'], group['display_name']]
             for group in groups if
             group['id'] not in pkg_group_ids]
