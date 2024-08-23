@@ -33,3 +33,4 @@ def get_all_groups():
     return [[group['id'], group['display_name']]
             for group in groups if
             group['id'] not in pkg_group_ids]
+
