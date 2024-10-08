@@ -37,7 +37,7 @@ class PackageGroupPermissionsPlugin(plugins.SingletonPlugin):
         :return:
         """
         authorized = False
-        if g.controller in ['package', 'dataset'] and g.action in ['groups']:
+        if g.blueprint in ['package', 'dataset'] and g.view in ['groups']:
             authorized = helpers.user_has_admin_access(include_editor_access=True)
 
         if not authorized:

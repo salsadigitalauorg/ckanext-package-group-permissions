@@ -12,6 +12,7 @@
 
   {% if groups %}
     <form class="add-to-group" method="post">
+      {{ h.csrf_input() }}
       <div class="form-group">
         <select id="field-add_group" class="form-control" name="group_added">
           {% for option in groups %}
@@ -25,6 +26,7 @@
 
   {% if c.pkg_dict.groups %}
     <form method="post">
+      {{ h.csrf_input() }}
       {% snippet 'group/snippets/group_list.html', groups=c.pkg_dict.groups %}
     </form>
   {% else %}
