@@ -16,7 +16,7 @@
   {% block link %}
     {{ super() }}
   {% endblock %}
-  {% if group.user_member or (h.check_access('member_delete', group) and c.controller in ['package', 'dataset'] and c.action in ['groups']) %}
+  {% if group.user_member or (h.check_access('member_delete', group) and g.blueprint in ['dataset'] and g.view in ['groups']) %}
     <input name="group_remove.{{ group.id }}" value="{{ _('Remove') }}" type="submit" class="btn btn-danger btn-sm media-edit" title="{{ _('Remove dataset from this group') }}"/>
   {% endif %}
 {% endblock %}
